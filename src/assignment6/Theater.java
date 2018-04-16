@@ -2,12 +2,18 @@
 package assignment6;
 
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Vector;
 
 public class Theater {
-    /*
-     * Represents a seat in the theater
-     * A1, A2, A3, ... B1, B2, B3 ...
+    private String show;
+    private Vector<Seat> available;
+    private Vector<Ticket> printed;
+
+    /**
+     * represents a seat in the theater
+     * i.e A1, A2 etc.
      */
     static class Seat {
         private int rowNum;
@@ -41,9 +47,9 @@ public class Theater {
         }
     }
 
-    /*
-       * Represents a ticket purchased by a client
-       */
+    /**
+     * represents the ticket purchased by a customer
+     */
     static class Ticket {
         private String show;
         private String boxOfficeId;
@@ -75,44 +81,73 @@ public class Theater {
 
         @Override
         public String toString() {
-            // TODO: Implement this method to return a string that resembles a ticket
-            return "";
+            StringBuilder ret = new StringBuilder();
+            ret.append("-------------------------------\n");
+            ret.append("| Show: " + getShow());
+            for(int i = 0; i < (22-getShow().length()); i++) ret.append(" ");
+            ret.append("|\n");
+            ret.append("| Box Office ID: " + getBoxOfficeId());
+            for(int i = 0; i < (13-getBoxOfficeId().length()); i++) ret.append(" ");
+            ret.append("|\n");
+            ret.append("| Seat: " + getSeat().toString());
+            for(int i = 0; i < (22-getSeat().toString().length()); i++) ret.append(" ");
+            ret.append("|\n");
+            ret.append("| Client: " + getClient());
+            for(int i = 0; i < (20-getClient()); i++) ret.append(" ");
+            ret.append("|\n");
+            ret.append("-------------------------------\n");
+            return ret.toString();
         }
     }
 
+    /**
+     * Theater constructor to make a theater object
+     */
     public Theater(int numRows, int seatsPerRow, String show) {
-        // TODO: Implement this constructor
+        this.show = show;
+        printed = new Vector<Ticket>();
+        available = new Vector<Seat>();
+        for(int i = 1; i <= numRows; i++){
+            for(int j = 1; j <= seatsPerRow; j++){
+                Seat temp = new Seat(i, j);
+                available.add(temp);
+            }
+        }
     }
 
-    /*
-     * Calculates the best seat not yet reserved
-     *
-      * @return the best seat or null if theater is full
-   */
+    /**
+     * returns the best available seat in the theater
+     * @return null if already taken or the best seat
+     */
     public Seat bestAvailableSeat() {
-        //TODO: Implement this method
-        return new Seat(0, 0);
+        if(available.isEmpty()) return null;
+        return available.remove(0);
     }
 
-    /*
+    /**
      * Prints a ticket for the client after they reserve a seat
-   * Also prints the ticket to the console
-     *
-   * @param seat a particular seat in the theater
-   * @return a ticket or null if a box office failed to reserve the seat
-   */
+     * Also prints the ticket to the console
+     * @param boxOfficeId
+     * @param seat a particular seat in the theater
+     * @return a ticket or null if a box office failed to reserve the seat
+     */
     public Ticket printTicket(String boxOfficeId, Seat seat, int client) {
-        //TODO: Implement this method
-        return new Ticket("", "", new Seat(0, 0), 0);
+        if(seat == null) return null;
+        Ticket temp = new Ticket(show, boxOfficeId, seat, client);
+        printed.add(temp);
+        return temp;
+    }
+
+    /**
+     * returns list of tickets in the printed order
+     * @return list of printed tickets
+     */
+    public List<Ticket> getTransactionLog() {
+        return new ArrayList<Ticket>(printed);
     }
 
     /*
-     * Lists all tickets sold for this theater in order of purchase
-     *
-   * @return list of tickets sold
-   */
-    public List<Ticket> getTransactionLog() {
-        //TODO: Implement this method
-        return new ArrayList<Ticket>();
-    }
+    public Vector<Seat> orderedSeats(){
+        return available;
+    }*/
 }
