@@ -38,6 +38,7 @@ public class BoxOffice implements Runnable {
     @Override
     public void run(){
         Theater.Seat tempSeat;
+        boolean printed = false;
         for(int i = 0; i < numClients; i++){
             synchronized (theater) {
                 tempSeat = theater.bestAvailableSeat();
@@ -45,7 +46,10 @@ public class BoxOffice implements Runnable {
                     theater.reserveSeat(tempSeat);
                     Theater.Ticket tempTicket = theater.printTicket(BOID, tempSeat, theater.getClientNum());
                 } else {
-                    System.out.println("Sorry, we are sold out!");
+                    if(!printed) {
+                        System.out.println("Sorry, we are sold out!");
+                        printed = true;
+                    }
                     i = numClients;
                 }
             }
