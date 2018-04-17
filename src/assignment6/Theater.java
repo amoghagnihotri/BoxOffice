@@ -1,4 +1,11 @@
-// insert header here
+/* MULTITHREADING <Theater.java>
+ * EE422C Project 6 submission by
+ * Amogh Agnihotri
+ * aa73264
+ *
+ * Slip days used:
+ * Spring 2018
+ */
 package assignment6;
 
 import java.util.ArrayList;
@@ -19,19 +26,34 @@ public class Theater {
         private int rowNum;
         private int seatNum;
 
+        /**
+         * seat constructor
+         * @param rowNum number of rows
+         * @param seatNum number of seats per row
+         */
         public Seat(int rowNum, int seatNum) {
             this.rowNum = rowNum;
             this.seatNum = seatNum;
         }
 
+        /**
+         * accessor for number of seats
+         */
         public int getSeatNum() {
             return seatNum;
         }
 
+        /**
+         * accessor for number of rows
+         */
         public int getRowNum() {
             return rowNum;
         }
 
+        /**
+         * Converts seat and row number to String format
+         * @return string representation (A1, A2, etc)
+         */
         @Override
         public String toString() {
             StringBuilder ret = new StringBuilder();
@@ -56,6 +78,9 @@ public class Theater {
         private Seat seat;
         private int client;
 
+        /**
+         * Ticket constructor
+         */
         public Ticket(String show, String boxOfficeId, Seat seat, int client) {
             this.show = show;
             this.boxOfficeId = boxOfficeId;
@@ -63,22 +88,38 @@ public class Theater {
             this.client = client;
         }
 
+        /**
+         * accessor method for the seat
+         */
         public Seat getSeat() {
             return seat;
         }
 
+        /**
+         * accessor for show name
+         */
         public String getShow() {
             return show;
         }
 
+        /**
+         * accessor method for BoxOfficeId
+         */
         public String getBoxOfficeId() {
             return boxOfficeId;
         }
 
+        /**
+         * accessor method for client number
+         */
         public int getClient() {
             return client;
         }
 
+        /**
+         * Converts the Ticket to a string representation
+         * @return nicely formatted string of a Ticket
+         */
         @Override
         public String toString() {
             StringBuilder ret = new StringBuilder();
@@ -93,7 +134,7 @@ public class Theater {
             for(int i = 0; i < (22-getSeat().toString().length()); i++) ret.append(" ");
             ret.append("|\n");
             ret.append("| Client: " + getClient());
-            for(int i = 0; i < (20-getClient()); i++) ret.append(" ");
+            for(int i = 0; i < (20-(Integer.toString(getClient())).length()); i++) ret.append(" ");
             ret.append("|\n");
             ret.append("-------------------------------\n");
             return ret.toString();
@@ -119,7 +160,7 @@ public class Theater {
      * returns the best available seat in the theater
      * @return null if already taken or the best seat
      */
-    public Seat bestAvailableSeat() {
+    public synchronized Seat bestAvailableSeat() {
         if(available.isEmpty()) return null;
         return available.remove(0);
     }
@@ -131,10 +172,14 @@ public class Theater {
      * @param seat a particular seat in the theater
      * @return a ticket or null if a box office failed to reserve the seat
      */
-    public Ticket printTicket(String boxOfficeId, Seat seat, int client) {
+    public synchronized Ticket printTicket(String boxOfficeId, Seat seat, int client) {
         if(seat == null) return null;
-        Ticket temp = new Ticket(show, boxOfficeId, seat, client);
+        Ticket temp = new Ticket(show, boxOfficeId, seat, getClientNum());
         printed.add(temp);
+        System.out.println(temp.toString());
+        try{
+            Thread.sleep(50);
+        } catch (InterruptedException ie){}
         return temp;
     }
 
@@ -146,8 +191,19 @@ public class Theater {
         return new ArrayList<Ticket>(printed);
     }
 
-    /*
-    public Vector<Seat> orderedSeats(){
-        return available;
-    }*/
+    /**
+     * returns the client number according to their position in the "global" line
+     */
+    public synchronized int getClientNum(){
+        return (printed.size() + 1);
+    }
+
+    /**
+     * removes the seat being reserved from the available seats
+     * @param seat seat to be removed
+     */
+    public synchronized void reserveSeat(Seat seat){
+        available.remove(seat);
+    }
+
 }
